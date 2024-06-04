@@ -1,0 +1,345 @@
+To config the router in ciscoo
+===============================================================================================================================
+
+no
+en - ernable the router
+conf t - 
+int
+gig 	tab
+int gig 0/0/0   [ show ip int brief]
+ip address 0.0.0.0 255.255.255.0
+no shut
+exit
+hostname R1
+copy running config 
+==================================================================================================================================
+
+MODE 				NAME						USAGE
+Router> 			userexec mode					login, view basic settings
+Router#				privilege mode					view/save/delete settings, backup and restore
+Router(config)#			Global configuration mode			set basic configuration , go to other modes
+Router(config-if)#		interface mode					set ip , turn on/off ports
+Router(config-line)#		line mode 					configure console and remote access
+Router(config-router)#		routing mode					set dynamic routing protocols
+
+
+ROUTER 1
+==================================================================================================================
+Router>enable    
+Router#configure terminal
+Router(config)#hostname (name of router >> R1)   >>>>>> to rename the router
+R1(config)#interface f0/0
+R1(config-if)#ip address 192.168.10.1 255.255.255.0
+R1(config-if)#no shutdown
+R1(config-if)#exit
+R1(config)#exit
+R1#
+R1#copy running-config startup-config (press two time enter)[TO save this setting in NVRAM](first enter handa naya file name diyo vaney tyo settting kjo copy gayerw tyo file ma basxa)
+
+//.#end command or (ctrl + Z) >>>> takes directly to the previlige mode
+
+===============================================================
+TO DELETE ALL SETTINGS
+
+R1#erase startup-config
+R1#reload (to restart the router)
+
+================================================================
+HOW TO SET PASSWORD IN CISCO DEVICES
+[sabai main kam garna lai config# ma jana parxa)
+R1(config)#line console 0
+R1(config-line)#password 6969
+R1(config-line)#login
+R1(config-line)#end
+R1#
+R1# copy running-config startup-config [press two time enter]
+R1#exit >>>>>>> to log out
+
+===========================================
+TO SET SECONDARY PASSWORD
+R1(config)# enable password 9696
+then save.........
+
+==========================================
+HOw to recover passwor if forgotten
+
+
+
+
+
+
+
+===========================
+how to delete each setting
+R1(config)#line console 0
+R1(config-line)#no password
+R1(config-line)#no login
+R1(config-line)#exit
+R1(config)#no enable password
+R1(config)#end
+R1#
+R1#copy running-config startup-config
+
+Transalting error
+(ctrl+shift+6)
+
+
+R1#show ip int brief   >>>>>To display ip of router
+R1#show protocols    >>>>>To display ip with subnet mask
+R1#show running-config	 >>>>To display all setting
+R1#show startup-config  >>>>>To display saved setting {yesko limitation chai yettikai xodyo vaney koi aru aayera access garna milxa}
+
+R1#configure terminal
+R1(config)#service password-encryption >>>show garda kheri password encryption garxa
+
+R1(onfig)#username arun password 123
+R1(onfig)#username user1 secret 123
+R1(onfig)#username user2
+R1(onfig)#enable secret 123
+R1(onfig)#line console 0
+R1(onfig)#login local
+R1(onfig)#banner login $Pusparaj jhukega nahi$
+
+Inside line console 0
+R1(onfig-line)#exec-timeout 5 40(sec) >>>range(0-35791) second pani dinna milxa
+
+
+
+DHCP SERVER
+
+>>IP ADDRESS, SUBNET MASK, GATEWAY, DNS  --AUTO DISTRIBUTES
+>>IT IS A CLINT SERVER PROTOCOL
+
+DORA PROCESS
+===========================
+DISCOVER - CLIENT(send by client for ip pack) - BROADCAST (signal is broadcasted to every devices)
+OFFER    - DHCP SERVER (dhcp server receives the signal and unicast the signal)(yesle offer garxa client lai certain ip chalaunxas ki nai vanerw e.g do you want to use 192.168.1.2)
+REQUEST  - BROADCAST (client le ip paye paxi broadcast gardinxa kina ki tyo ip kosai aru sanga same hunu hudaina natra conflict aunxa)
+ACKNOWLEDGEMENT - ip address conflict aayena vaney server ley teslai acknowledement garena ip confirms garxa
+
+APIPA (computer afulai afai diney ip address class b ko hunxa i.e 169.254.0.0)
+
+1. GIVE ANY REQUIRED IP EXCLUSIONS
+	>> sepcific devices haru ko lagi yeuta cartain ip range xutauney (static)
+	>> home router (dynamic 101-199)(static 1-100,200-254)
+2. CREATE DHCP POOL
+	>> NETWORK ID , SUBNET MASK, GATEWAY, DNS SERVER
+	>>R1(config)#ip dhcp excluded-address 192.168.10.1
+	>>R1(config)#ip dhcp excluded-address 192.168.10.11 192.168.10.60
+	>>FOR DHCP POOL
+	>>network 192.168.30.0 255.255.255.0
+	>>ip dhcp pool Pool_Name
+	>>default-router 192.168.10.1
+	>>dns-server 8.8..8.8
+>>to view dhcp ip pool  = R1# show ip dhcp pool
+>>kun kun ip automatically diyo dhcp sever ley herna ko lagi >>show ip dhcp binding
+>>ip conflict ko lagi >> R1#show ip dhcp conflict
+
+
+REMOTE ACCESS
+
+>>  Telnet, SSh -secure shell
+
+>> PORT/INTERFACE
+>> vty - virtual teletype (to access router from remote)(total 16 wota virtual port banauna milxa i.e 0 - 15)
+>> Primary - user name and password
+>> secondary password (compulsory)
+	>>R1(config)#line vty 0 7
+	>>R1(config-line)#transport input telnet
+	>>R1(config-line)#login local
+	>>R1(config line)#exit
+R1(config)#username admin secret 123
+R1(config)#end
+R1#copy run start
+
+
+>>SSH (Secure shell)
+needs-
+	-hostname
+	-domain name// could be any
+	-key -- how many bits??? 360 to 2048
+	-ssh version 2 - Min. 768+
+	
+syntax - 
+	R1(config)#ip domain name <domain_name>
+	R1(config)#crypto key generate rsa // give bits greater than 768 for ssh v2
+	R1(config)#ip ssh version 2
+	R1(config)#line vty 0 7
+	R1(config)#transport input ssh (for ssh only ) or transport input ssh all (for ssh and telnet)
+	R1(config)#login local
+	R1(config)#end  (and save )
+	line vty 0 7
+Connecting to router from pc(user)
+
+cmd >> ssh -l <username> <ip of router>
+
+===Connecting to router from pc(user)
+
+cmd vitra
+>>telnet (router ip)
+
+
+to connect to internet from local area network
+>>WIC - Wan Interface COntroller
+>> WIC - 1T - SINGLE PORT
+>>WIC - 2T - TWO PORT
+
+SLOT 0 
+>SERIAL 0/0/0
+>SERIAL 0/0/1
+
+SLOT 1
+>SERIAL 0/1/0
+>SERIAL 0/1/1
+
+WIC - Network adpter + Processor 
+
+setup=====
+
+
+R1(config)#interface s0/0/0
+R1(config-if)#ip add 10.10.10.1 255.255.255.252
+R1(config-if)#clock rate (300-4000000) (paila ? garney range thaha pauna ko lagi)
+R1(config-if)#bandwidth 10000 (1 - 10000000)
+R1(config-if)#no shutdown
+R1(config)#end
+R1#copy run start
+
+
+ROUTING 
+=============================================================================================================
+
+>>process of forwarding packets from one network to another
+
+ROUTING SETUP
+
+1. DESTINATION NETWORK ID 
+2. DESTIANATION SUBNET MASK
+3. NEXT HOP, REMOTE ROUTER
+
+
+ROUTING TABLE ---( INPUT ABOVE  INFORMAY-TION IN ROUTING TABLE)
+
+PRE CREATED HUNXA ROUTING TABLE
+DIRECTLY CONNECTED NETWORK INFO. ALREADY HUNXA
+
+TO VIEW ROUTING TABLE
+R1# SHOW IP ROUTE
+
+ROUTING TYPES
+>MANUAL ROUTING
+	1. STATIC ROUTING
+	    >SYNTAX:
+		R1(config)#ip route (dest network id> <dest subnetmask> <next hop>or<outgoing port name i.e s0/0/0>
+	PROS
+	- FULL CONTROL
+	- FASTEST
+	-
+	
+	CONS
+	-NETWORK DETAILS
+	-TIME AND EFFORT
+	-HUMAN ERROR
+	-FIXED ROUTES,CANNOT ADAPT TO CHANGE
+	
+	2. DEFAULT ROUTING
+	
+	R1(CONFIG)#ip route 0.0.0.0 0.0.0.0 s0/0/0 (instead of ip we use port name)
+	R2(CONFIG)#ip route 0.0.0.0 0.0.0.0 s0/0/0 
+	R2(CONFIG)#ip route 0.0.0.0 0.0.0.0 s0/0/1
+	R3(CONFIG)#ip route 0.0.0.0 0.0.0.0 s0/0/0
+	
+	used in - STUB AREA i.e used in only single outgoing path
+	for two outgoing path we use static routing
+	
+
+	3. FLOATING STATIC ROUTE
+
+>DYNAMIC ROUTING
+	1. RIP (routing information protocol)
+	- Distance Vector = No. of Hops(lowest), Max hop count is 15 only.
+	- v1,v2 (for ipv4), RIP-NG (ipv6)
+	- V1 = 	Routing updates are sent as broadcast
+		It can only support classful networks.
+	- V2 =  Routing updates are sent as multicast
+		It can support classless networks, it has to be manually enabled
+
+
+	enable
+	CONF T
+	R1(config)#router ?
+	R1(config)#router RIP
+	R1(config-router)#version 2
+	R1(config-router)#no auto-summary  (Auto summary direcltly uses classful subnetmask, to prevent it we use no auto-summary)
+	R1(config-router)#network 10.10.10.0
+	R1(config-router)#network 192.168.10.0
+	R1(config-router)#passive-interface f0/0
+	R1(config-router)#end
+	copy run start
+	
+	UPDATE TIMER	 30  -Full routing table send and request by every router in every 30 second
+	INVALID TIMER	 180 -Every 180s if one router dont get the respone it confirms  PATH--UNREACHABLE
+	HOLD DOWN TIMER  180 -Unstable path lai wait garxa ani stable vayo vaney matra routing table ma rakhxa
+	FLUSH TIMER 	 240 -After 240 second UNREACHABLE PATH are deleted
+	
+	TO SET :
+	R1(CONFIG)3router rip
+	R1(config-router)#timers basic 120 280 280 340
+	R1(config-router)#end
+	copy run start
+	
+
+
+	2. EIGRP (Enchanced Interior Gateway Routing Protocol)
+	-Created By CISCO, only for CISCO
+	-Hybrid routing protocol (by merging distance vector and linked list)
+	-Since 2013 partially open source i.e can be used in any vendor devices
+	- ROUTING METRIC :
+	- DEFAULT FACTORS ARE BANDWIDTH AND DELAY
+	- only changed data are store in routing table i.e incremental updates
+	- every 5 sec sends hello msg, i.e ping, if not receive within 15 sec it sets dead timer
+
+	EIGRP creates 3 tables :
+
+	ROUTING TABLE - STORES FASTEST ROUTES
+	
+	NEIGHBOUR TABLE - STORES DIRECTLY CONNECTED HOP - INFO.
+	
+	TOPOLOGY TABLE - STORES ALL PATHS OF EVERY DESTINATION
+	
+	----------------------------------------------------------------------------------------
+	- every network are in group
+	-group name is AUTONOMOUS SYSTEM (1 - 65535)
+	-RECOMMENDED 1 GRUOUP = MAX. 50 NETWORK, DEFAULT - 100 N/W, CAN CREATE UP TO 250 NETWORK
+	GROUP PLAN:
+	GROUP NO. 10
+	DIRECTLY CONNECTED NETWORK ID + WILDCARD MASK
+	FOR WILDCARD MASK:
+		10.10.10.0 255.255.255.252 (255.255.255.255 - 255.255.255.252 = 0.0.0.3(WILDCARD MASK)
+		192.168.10.0 255.255.255.0  = 0.0.0.255(wildcard mask)
+	TO CONFIGURE : 
+	R1(config)#router eigrp 10
+	R1(config-router)#no auto-summary
+	R1(config-router)#network 192.168.10.0  0.0.0.255(wildcard mask i.e 255.255.255.255 - subnetmask)
+	R1(config-router)#network 10.10.10.0  0.0.0.0.3(wildcrd mask)
+	R1(config-router)#end
+	copy run start
+	
+	
+	
+	3. OSPF (Open Shortest Path First)
+	
+	
+	
+		
+	
+	
+	
+	
+
+
+	4. BGP (border gateway protocol)
+	
+	
+	
+	
